@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WashWise — Laundry Care Symbol Decoder & Wash Guide</title>
+<meta name="description" content="WashWise decodes laundry symbols meaning instantly: click the symbols on your garment label to get a plain-English care card. Includes a full laundry symbol chart, mixed-load conflict checker, garment profiles and a printable cheat sheet.">
+<meta name="keywords" content="laundry symbols meaning, what do laundry care symbols mean, laundry symbol chart, wash care symbols, clothing label symbols">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{ --bg:#0e1b2c; --primary:#38bdf8; --accent:#fbbf24; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--bg); color:#e8f1fb; font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+  .glow-card{ background:linear-gradient(160deg,rgba(56,189,248,.10),rgba(56,189,248,.02)); border:1px solid rgba(56,189,248,.22); }
+  .sym-tile{ display:flex; flex-direction:column; align-items:center; gap:.4rem; padding:.7rem .4rem; border-radius:.9rem;
+    background:rgba(148,163,184,.06); border:1px solid rgba(148,163,184,.18); cursor:pointer; transition:transform .15s,border-color .15s,box-shadow .15s; }
+  .sym-tile:hover{ transform:translateY(-2px); border-color:var(--primary); box-shadow:0 6px 18px rgba(56,189,248,.18); }
+  .sym-tile.selected{ border-color:var(--accent); background:rgba(251,191,36,.10); box-shadow:0 0 0 1px var(--accent),0 6px 18px rgba(251,191,36,.15); }
+  .sym-tile svg{ width:52px; height:52px; }
+  .sym-tile span{ font-size:.68rem; line-height:1.15; text-align:center; color:#cbd5e1; }
+  .fam-chip{ padding:.4rem .9rem; border-radius:9999px; font-size:.8rem; border:1px solid rgba(148,163,184,.3); cursor:pointer; color:#cbd5e1; background:rgba(148,163,184,.06); }
+  .fam-chip.active{ background:var(--primary); color:#0e1b2c; border-color:var(--primary); font-weight:700; }
+  .tab-btn{ padding:.6rem 1.1rem; border-radius:.75rem .75rem 0 0; font-weight:600; font-size:.9rem; color:#94a3b8; border:1px solid transparent; border-bottom:none; cursor:pointer; }
+  .tab-btn.active{ color:var(--primary); background:rgba(56,189,248,.08); border-color:rgba(56,189,248,.25); }
+  .chip-x{ cursor:pointer; }
+  .timeline-dot{ width:2.4rem; height:2.4rem; border-radius:9999px; display:flex; align-items:center; justify-content:center; font-weight:800; flex:none; }
+  details.faq{ background:rgba(148,163,184,.06); border:1px solid rgba(148,163,184,.18); border-radius:.75rem; padding:1rem 1.25rem; }
+  details.faq summary{ cursor:pointer; font-weight:600; color:var(--primary); }
+  details.faq p{ margin-top:.6rem; color:#cbd5e1; font-size:.95rem; line-height:1.65; }
+  .article h2{ color:var(--primary); font-size:1.35rem; font-weight:800; margin:1.8rem 0 .7rem; }
+  .article h3{ color:var(--accent); font-size:1.1rem; font-weight:700; margin:1.4rem 0 .5rem; }
+  .article p, .article li{ color:#cbd5e1; line-height:1.75; font-size:.98rem; }
+  .article p{ margin:.7rem 0; } .article ul{ list-style:disc; padding-left:1.4rem; margin:.6rem 0; }
+  #print-sheet{ display:none; }
+  @media print{
+    .no-print{ display:none !important; }
+    body > *:not(#print-sheet){ display:none !important; }
+    #print-sheet{ display:block !important; background:#0e1b2c; color:#e8f1fb; -webkit-print-color-adjust:exact; print-color-adjust:exact; padding:1.2rem; }
+    #print-sheet .ps-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:.6rem; }
+    #print-sheet svg{ width:40px; height:40px; }
+  }
+</style>
+</head>
+<body id="top" class="min-h-screen">
+<a id="top-anchor"></a>
+
+<!-- Sticky header -->
+<header class="no-print sticky top-0 z-40 backdrop-blur border-b border-sky-400/20" style="background:rgba(14,27,44,.88)">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2.5">
+      <svg viewBox="0 0 64 64" class="w-9 h-9" aria-hidden="true">
+        <rect x="8" y="8" width="48" height="48" rx="10" fill="none" stroke="#38bdf8" stroke-width="4"/>
+        <circle cx="32" cy="36" r="13" fill="none" stroke="#38bdf8" stroke-width="4"/>
+        <path d="M24 36 q4 -6 8 0 t8 0" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round"/>
+        <rect x="14" y="14" width="10" height="5" rx="2.5" fill="#38bdf8"/>
+      </svg>
+      <span class="text-2xl font-extrabold tracking-tight">Wash<span style="color:#38bdf8">Wise</span></span>
+    </a>
+    <nav class="flex items-center gap-5 text-sm font-semibold">
+      <a href="#top" class="text-slate-300 hover:text-sky-300">Home</a>
+      <a href="https://fixoraa.tech" class="text-slate-300 hover:text-sky-300">More Tools</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Badge -->
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-5 text-center">
+  <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest" style="background:rgba(251,191,36,.12);border:1px solid #fbbf24;color:#fbbf24">
+    <svg viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+    Unlimited Free Usage
+  </span>
+  <p class="text-xs text-slate-400 mt-2">No signup &middot; No paywall &middot; No watermark &middot; Works fully offline</p>
+</div>
+
+<!-- TOP AD -->
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pt-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <div class="origin-top scale-[0.44] sm:scale-100 shrink-0">
+        <script>
+          atOptions = { 'key' : '4e68ac77881c17fe128a46565d9a4e8c', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };
+        </script>
+        <script src="https://www.highrevenueformat.com/4e68ac77881c17fe128a46565d9a4e8c/invoke.js"></script>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOOL ============ -->
+<main id="tool" class="no-print mx-auto max-w-6xl px-4 sm:px-6 py-8">
+  <div class="text-center mb-7">
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Laundry Care <span style="color:#38bdf8">Symbol Decoder</span></h1>
+    <p class="text-slate-400 mt-2 max-w-2xl mx-auto">Tap the symbols printed on your garment label — WashWise translates them into a plain-English care card, a step-by-step wash timeline, and conflict warnings for mixed loads.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex flex-wrap gap-1 border-b border-sky-400/20 mb-6" role="tablist">
+    <button class="tab-btn active" data-tab="tab-decoder" role="tab">Symbol Decoder</button>
+    <button class="tab-btn" data-tab="tab-load" role="tab">Mixed-Load Checker</button>
+    <button class="tab-btn" data-tab="tab-profiles" role="tab">Profiles &amp; Wash Log</button>
+    <button class="tab-btn" data-tab="tab-cheatsheet" role="tab">Cheat Sheet</button>
+  </div>
+
+  <!-- TAB: DECODER -->
+  <section id="tab-decoder" role="tabpanel">
+    <div class="grid lg:grid-cols-5 gap-6">
+      <div class="lg:col-span-3">
+        <div class="flex flex-wrap gap-2 mb-4" id="family-chips"></div>
+        <input id="symbol-search" type="search" placeholder="Search symbols — try &quot;bleach&quot;, &quot;30&quot;, &quot;tumble&quot;…"
+          class="w-full mb-4 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/60 text-slate-100 placeholder-slate-500 outline-none focus:border-sky-400">
+        <div id="symbol-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5"></div>
+      </div>
+      <div class="lg:col-span-2">
+        <div class="glow-card rounded-2xl p-5 sticky top-20">
+          <h2 class="font-bold text-lg mb-1">Your garment label</h2>
+          <p class="text-xs text-slate-400 mb-3">Selected symbols appear here. Tap again to remove.</p>
+          <div id="label-tray" class="flex flex-wrap gap-2 mb-4 min-h-[3rem]"></div>
+          <div class="flex gap-2 mb-5">
+            <button id="decode-btn" class="flex-1 px-4 py-2.5 rounded-xl font-bold text-sm" style="background:#38bdf8;color:#0e1b2c">Decode label</button>
+            <button id="clear-label-btn" class="px-4 py-2.5 rounded-xl font-bold text-sm border border-slate-600 text-slate-300 hover:border-slate-400">Clear</button>
+          </div>
+          <div id="care-card"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: MIXED-LOAD CHECKER -->
+  <section id="tab-load" role="tabpanel" class="hidden">
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="glow-card rounded-2xl p-5">
+        <h2 class="font-bold text-lg mb-1">Build your laundry load</h2>
+        <p class="text-xs text-slate-400 mb-4">Decode a label in the Symbol Decoder tab, then add the garment here — or add garments with no symbols and decode later.</p>
+        <div class="flex gap-2 mb-4">
+          <input id="garment-name" type="text" placeholder="Garment name — e.g. White cotton shirt"
+            class="flex-1 px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/60 text-slate-100 placeholder-slate-500 outline-none focus:border-sky-400">
+          <button id="add-garment-btn" class="px-4 py-2.5 rounded-xl font-bold text-sm" style="background:#38bdf8;color:#0e1b2c">Add garment</button>
+        </div>
+        <p class="text-xs text-slate-500 mb-2">Tip: the garment takes the symbols currently selected in the Decoder tab (<span id="tray-count">0</span> selected).</p>
+        <div id="garment-list" class="space-y-2"></div>
+      </div>
+      <div class="glow-card rounded-2xl p-5">
+        <h2 class="font-bold text-lg mb-1">Conflict report</h2>
+        <p class="text-xs text-slate-400 mb-4">Checks wash temperature, cycle gentleness, bleach rules and drying method across every garment in the load.</p>
+        <button id="check-load-btn" class="w-full px-4 py-2.5 rounded-xl font-bold text-sm mb-4" style="background:#fbbf24;color:#0e1b2c">Check for conflicts</button>
+        <div id="conflict-results" class="space-y-2.5"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: PROFILES + WASH LOG -->
+  <section id="tab-profiles" role="tabpanel" class="hidden">
+    <div class="grid lg:grid-cols-2 gap-6">
+      <div class="glow-card rounded-2xl p-5">
+        <h2 class="font-bold text-lg mb-1">Garment care profiles</h2>
+        <p class="text-xs text-slate-400 mb-4">Save a decoded label as a reusable profile. Stored only in this browser.</p>
+        <div class="space-y-2.5 mb-4">
+          <input id="profile-name" type="text" placeholder="Profile name — e.g. Blue denim jacket"
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/60 text-slate-100 placeholder-slate-500 outline-none focus:border-sky-400">
+          <input id="profile-fabric" type="text" placeholder="Fabric note (optional) — e.g. 98% cotton, 2% elastane"
+            class="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-600/60 text-slate-100 placeholder-slate-500 outline-none focus:border-sky-400">
+          <button id="save-profile-btn" class="w-full px-4 py-2.5 rounded-xl font-bold text-sm" style="background:#38bdf8;color:#0e1b2c">Save current label as profile</button>
+        </div>
+        <div id="profile-list" class="space-y-2.5"></div>
+      </div>
+      <div class="glow-card rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-1">
+          <h2 class="font-bold text-lg">Wash-history log</h2>
+          <button id="clear-history-btn" class="text-xs text-slate-400 hover:text-red-300 underline">Clear log</button>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">Every time you wash a garment, log it — handy for tracking how often delicates get washed.</p>
+        <div id="wash-history" class="space-y-2"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: CHEAT SHEET -->
+  <section id="tab-cheatsheet" role="tabpanel" class="hidden">
+    <div class="glow-card rounded-2xl p-5 mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="font-bold text-lg">Laundry-room cheat sheet</h2>
+        <p class="text-xs text-slate-400">All 62 symbols on one printable page. Stick it on the wall above your machine.</p>
+      </div>
+      <button id="print-cheatsheet" class="px-5 py-2.5 rounded-xl font-bold text-sm" style="background:#fbbf24;color:#0e1b2c">Print cheat sheet</button>
+    </div>
+    <div id="cheatsheet" class="space-y-8"></div>
+  </section>
+</main>
+
+<!-- Print-only sheet -->
+<div id="print-sheet" aria-hidden="true"></div>
+
+<!-- BOTTOM AD -->
+<div class="no-print mx-auto max-w-6xl px-4 sm:px-6 pb-4" role="complementary" aria-label="Advertisement">
+  <div class="mx-auto text-center" style="max-width:728px">
+    <span class="block text-[10px] tracking-[0.18em] uppercase text-slate-400 mb-1.5">Advertisement</span>
+    <div class="flex justify-center overflow-hidden">
+      <script async src="https://js.wpadmngr.com/static/adManager.js" data-admpid="464498"></script>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SEO ARTICLE ============ -->
+<article id="seo-article" class="article mx-auto max-w-4xl px-4 sm:px-6 py-10">
+  <h2>Laundry Symbols Meaning: The Complete Guide to What Do Laundry Care Symbols Mean</h2>
+  <p>Every piece of clothing you own carries a small strip of fabric covered in cryptic icons — a tub with a number, a triangle, a square with a circle inside, an iron with dots. If you have ever stared at a care label and wondered what do laundry care symbols mean, you are not alone: surveys regularly find that most people ignore these symbols entirely, and ruined garments are the price. This guide explains the full laundry symbols meaning system, family by family, so you never shrink a sweater or melt a shirt again.</p>
+  <p>Care symbols are not random doodles. They follow ISO 3758, an international standard that assigns every symbol a precise meaning, so a label printed in Portugal means exactly the same thing as one printed in Bangladesh. The system uses five basic shapes, each governing one stage of garment care: the tub for washing, the triangle for bleaching, the square for drying, the iron for ironing, and the circle for professional cleaning. Learn the five shapes and their modifiers — numbers, bars, dots and crosses — and you can decode any label in the world in seconds.</p>
+
+  <h2>The Five Families of the Laundry Symbol Chart</h2>
+  <p>Think of the laundry symbol chart as five mini-languages. The tub always talks about washing: how hot the water can be and how rough the cycle may get. The triangle always talks about bleach. The square always talks about drying. The iron always talks about ironing. The circle always talks about professional dry cleaning or wet cleaning. A diagonal cross through any symbol is the universal "do not" — a crossed tub means do not wash, a crossed triangle means do not bleach, a crossed iron means do not iron. Once you internalise that grammar, even unfamiliar labels become readable.</p>
+  <p>Modifiers add the detail. A number inside the tub is the maximum wash temperature in Celsius. Bars under the tub describe cycle gentleness: no bar is a normal cycle, one bar is a gentle or permanent-press cycle with reduced agitation, and two bars is a very gentle delicates cycle with minimal spin. Dots work like a heat dial on drying and ironing symbols: one dot is low, two dots is medium, three dots is high. On the bleach triangle, diagonal stripes mean oxygen or non-chlorine bleach only. On drying squares, extra lines distinguish line drying, drip drying and flat drying, while small diagonal marks in the corner mean "dry in the shade".</p>
+
+  <h2>Washing Symbols: The Tub</h2>
+  <p>The tub is the most common symbol and the one people get wrong most often. A plain tub means machine washable on a normal cycle. A tub with "30", "40" or "60" sets the maximum water temperature — and this is a ceiling, not a target: washing at 30 when the label says 40 is always safe, but washing at 60 when it says 30 risks shrinkage and colour loss. The single most expensive mistake in home laundry is ignoring these numbers on wool, viscose and dark cottons.</p>
+  <p>Bars under the tub matter just as much as the temperature. One bar means permanent press: less agitation, a slower spin, and ideally removing clothes promptly so wrinkles do not set. Two bars mean delicates: the mildest machine setting, ideally with the garment inside a mesh laundry bag. A tub with a hand reaching into the water means hand wash only — the machine, even on a gentle cycle, is too rough. A crossed-out tub means do not wash at home at all; that garment belongs at a professional cleaner. You will also see a twisted-cloth icon with a cross, meaning do not wring — twist-drying stretches knits and damages elastic fibres, so press the water out gently or roll the garment in a towel instead.</p>
+  <h3>Why temperature numbers exist</h3>
+  <p>Manufacturers test fabrics at specific temperatures before printing a number. A 30°C limit usually protects dyes and shrink-prone fibres, while 60°C is reserved for sturdy whites, bedding and towels where hygiene matters — hot water kills dust mites and most bacteria. The increasingly common "wash cold" guidance is not just about fabric care; modern detergents are formulated to work at low temperatures, and cold washes dramatically cut a household's energy use. When in doubt between two numbers, always choose the lower one.</p>
+
+  <h2>Bleaching Symbols: The Triangle</h2>
+  <p>An empty triangle is a green light for any bleach, including chlorine bleach. A triangle with two diagonal stripes is the one to memorise: it means oxygen or non-chlorine bleach only, and it appears on a huge share of coloured clothing. Chlorine bleach on a striped-triangle garment will strip the colour and weaken the fibres in a single wash. A crossed triangle means no bleach of any kind — reach for a colour-safe stain remover or an oxygen-based soak instead, after a patch test.</p>
+  <p>Bleach mistakes are irreversible, which is why this family deserves respect. If a label shows the empty triangle, you still do not need bleach in every wash; it simply permits it for whitening and sanitising. And remember that "non-chlorine bleach" includes the sodium-percarbonate powders sold as colour-safe whiteners — they are gentler, but they still deserve the dosage on the packet, not a guess.</p>
+
+  <h2>Drying Symbols: The Square</h2>
+  <p>The square family is the richest on the laundry symbol chart. A circle inside the square means tumble drying is allowed, and dots inside the circle set the heat: one dot for low, two for medium, three for high, and a filled-in dot for air-fluff with no heat at all. A crossed circle-in-square means the dryer is forbidden — air dry instead. Heat is the great shrinker: cotton and wool garments that survive the wash perfectly can still come out a size smaller after one hot dryer cycle, which is why low heat is the default smart choice.</p>
+  <p>Without the circle, the square describes air drying. A curved line joining the top corners means line dry. Three short vertical lines at the top mean drip dry — hang the garment soaking wet without wringing or spinning. A single horizontal line across the middle means dry flat, the essential instruction for heavy knits and sweaters that would stretch into strange shapes on a hanger. Small diagonal lines in the square's top corner add "in the shade": direct sunlight fades colours and can make elastic brittle, so shaded drying protects darks and swimwear especially.</p>
+  <h3>The dryer decisions that ruin clothes</h3>
+  <p>Two dryer errors cause most damage: tumble drying something marked do-not-tumble, and using high heat on medium-heat garments. The first shrinks wool and melts heat-sensitive synthetics; the second slowly degrades elastic in underwear, activewear and swimwear until the fit gives out months early. When a load mixes heat tolerances, always dry at the lowest dot count in the load — or pull the delicates out and air dry them.</p>
+
+  <h2>Ironing Symbols: The Iron</h2>
+  <p>The iron symbol is refreshingly literal: it looks like an iron, and dots set the temperature just like your iron's own dial. One dot means a cool iron up to 110°C for delicate synthetics such as nylon and acrylic. Two dots mean a warm iron up to 150°C for wool, silk and polyester. Three dots mean a hot iron up to 200°C for cotton and linen. A plain iron with no dots allows any temperature. A crossed iron means no ironing at all — heat will scorch, melt or glaze the fabric, so hang the garment straight out of the wash instead.</p>
+  <p>Two refinements are worth knowing. An iron with its steam lines crossed out means iron dry only: steam will watermark or spot the fabric, so keep the steam function off. And some labels ask you to iron on the reverse side, which protects prints, embroidery and dark fabrics from the shiny press marks a hot soleplate can leave. A quick rule of thumb: if you are unsure, start at one dot on an inside seam and work up.</p>
+
+  <h2>Professional Care Symbols: The Circle</h2>
+  <p>The circle family speaks to dry cleaners, but you should understand it before you hand anything over. An empty circle means dry clean. Letters inside specify the solvent: A allows any solvent, P restricts the cleaner to petroleum-based solvents, and F excludes the harshest solvent, trichloroethylene. A bar under the circle means the cleaning process itself must be gentle. A crossed circle means do not dry clean — the solvents would damage the garment.</p>
+  <p>The W inside a circle is newer and increasingly common: it means professional wet cleaning, a water-based process carried out by cleaners with specialised equipment — gentler than home washing for structured garments. Bars under the W work the same way, stepping down to very gentle. A crossed W rules wet cleaning out. If your garment shows any circle symbol, resist the urge to "just hand wash it gently instead": the manufacturer has determined that home water-based cleaning is unsafe, and the cleaner's process is genuinely different from your machine.</p>
+
+  <h2>Five Laundry Mistakes the Symbols Prevent</h2>
+  <ul>
+    <li><strong>The hot wash on darks:</strong> washing a 30°C garment at 60°C fades dark colours in a handful of cycles. The number is a ceiling — respect it.</li>
+    <li><strong>Chlorine bleach on colours:</strong> the striped triangle means oxygen bleach only. One cap of chlorine bleach can ruin a whole load of coloured laundry.</li>
+    <li><strong>The high-heat dryer:</strong> one hot cycle can shrink a cotton shirt a full size. Match the dots, and default to low.</li>
+    <li><strong>Wringing knits:</strong> twisting a wet sweater stretches it permanently. Press, do not wring, and dry flat.</li>
+    <li><strong>Ironing synthetics hot:</strong> a three-dot iron on a one-dot fabric melts the fibres into a shiny, irreparable patch.</li>
+  </ul>
+
+  <h2>How to Use the WashWise Decoder</h2>
+  <p>Reading this guide gives you the theory; WashWise gives you speed. Open the Symbol Decoder tab, tap each icon printed on your garment label, and WashWise builds a plain-English care card: what every symbol means, the warnings that matter, and an auto-ordered wash-to-dry-to-iron timeline. Decoding a five-symbol label takes under a minute — far less than replacing the garment.</p>
+  <p>For laundry day, the Mixed-Load Checker earns its keep. Add every garment in the planned load and it flags temperature clashes (a 60°C towel against a 30°C silk shirt), cycle conflicts (delicates mixed with a normal wash), bleach contradictions and dryer incompatibilities — the four ways a mixed load goes wrong. Save repeat offenders as garment profiles, log each wash, and print the cheat sheet for the laundry room wall so the whole household follows the same rules. Between this guide and the tool above, no care label should ever confuse you again.</p>
+</article>
+
+<!-- ============ FAQs ============ -->
+<section class="mx-auto max-w-4xl px-4 sm:px-6 pb-12">
+  <h2 class="text-2xl font-extrabold mb-5">Frequently Asked Questions</h2>
+  <div class="space-y-3">
+    <details class="faq">
+      <summary>What do the laundry care symbols mean?</summary>
+      <p>Laundry care symbols follow the ISO 3758 standard and use five shapes: a tub for washing, a triangle for bleaching, a square for drying, an iron for ironing, and a circle for professional dry cleaning. Numbers, bars, dots and crosses modify each shape — for example, a number in the tub is the maximum wash temperature, dots set heat levels, and a cross through any symbol means "do not". Tap the symbols on your label in the decoder above for a plain-English translation.</p>
+    </details>
+    <details class="faq">
+      <summary>What do the numbers inside the wash tub symbol mean?</summary>
+      <p>The number inside the tub is the maximum wash temperature in degrees Celsius. A "30" means wash at 30°C or colder; "60" allows up to 60°C. It is a ceiling, not a target — washing cooler than the number is always safe, but washing hotter risks shrinkage, colour loss and fabric damage.</p>
+    </details>
+    <details class="faq">
+      <summary>What do the bars under the wash symbol mean?</summary>
+      <p>Bars under the tub describe how gentle the wash cycle must be. No bar means a normal cycle, one bar means a gentle or permanent-press cycle with reduced agitation and spin, and two bars mean a very gentle delicates cycle — the mildest machine treatment, ideally with the garment in a mesh laundry bag.</p>
+    </details>
+    <details class="faq">
+      <summary>What do the dots on iron and tumble dryer symbols mean?</summary>
+      <p>Dots are a heat dial: one dot is low heat, two dots is medium, three dots is high. On the iron, one dot means a cool iron (max 110°C), two dots a warm iron (max 150°C) and three dots a hot iron (max 200°C). In the tumble-dryer circle, the dots set the dryer heat the same way, and a filled-in dot means air-fluff with no heat.</p>
+    </details>
+    <details class="faq">
+      <summary>What does the triangle symbol mean on clothes?</summary>
+      <p>The triangle governs bleaching. An empty triangle means any bleach is allowed, a triangle with diagonal stripes means oxygen or non-chlorine bleach only, and a crossed triangle means do not bleach at all. Using chlorine bleach on a striped-triangle garment will strip its colour and weaken the fibres.</p>
+    </details>
+    <details class="faq">
+      <summary>Can I wash something labelled "do not wash"?</summary>
+      <p>No — a crossed-out tub means the garment cannot be safely washed at home by machine or by hand. Take it to a professional cleaner and follow any dry-clean or wet-clean symbol on the label. Home washing a do-not-wash garment commonly causes shrinkage, felting or structural damage that cannot be reversed.</p>
+    </details>
+  </div>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What do the laundry care symbols mean?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Laundry care symbols follow the ISO 3758 standard and use five shapes: a tub for washing, a triangle for bleaching, a square for drying, an iron for ironing, and a circle for professional dry cleaning. Numbers, bars, dots and crosses modify each shape — a number in the tub is the maximum wash temperature, dots set heat levels, and a cross through any symbol means do not." } },
+    { "@type": "Question", "name": "What do the numbers inside the wash tub symbol mean?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The number inside the tub is the maximum wash temperature in degrees Celsius. It is a ceiling, not a target — washing cooler than the number is always safe, but washing hotter risks shrinkage, colour loss and fabric damage." } },
+    { "@type": "Question", "name": "What do the bars under the wash symbol mean?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Bars under the tub describe wash-cycle gentleness. No bar means a normal cycle, one bar means a gentle or permanent-press cycle with reduced agitation, and two bars mean a very gentle delicates cycle, ideally with the garment in a mesh laundry bag." } },
+    { "@type": "Question", "name": "What do the dots on iron and tumble dryer symbols mean?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Dots are a heat dial: one dot is low, two dots medium, three dots high. On the iron, one dot means a cool iron up to 110°C, two dots a warm iron up to 150°C, three dots a hot iron up to 200°C. In the dryer circle the dots set dryer heat, and a filled dot means air-fluff with no heat." } },
+    { "@type": "Question", "name": "What does the triangle symbol mean on clothes?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The triangle governs bleaching. An empty triangle means any bleach is allowed, a triangle with diagonal stripes means oxygen or non-chlorine bleach only, and a crossed triangle means do not bleach at all." } },
+    { "@type": "Question", "name": "Can I wash something labelled do not wash?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. A crossed-out tub means the garment cannot be safely washed at home by machine or by hand. Take it to a professional cleaner and follow any dry-clean or wet-clean symbol on the label." } }
+  ]
+}
+</script>
+
+<footer class="no-print border-t border-sky-400/20 mt-4">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 py-6 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-400">
+    <span>&copy; 2026 WashWise. Free laundry care decoder.</span>
+    <nav class="flex gap-5 font-semibold">
+      <a href="#top" class="hover:text-sky-300">Home</a>
+      <a href="https://fixoraa.tech" class="hover:text-sky-300">More Tools</a>
+    </nav>
+  </div>
+</footer>
+
+<script id="v3-washwise-laundry-care-decoder-lib">
+/* WashWise — Laundry Care Symbol Decoder: pure logic + 62-symbol ISO dataset.
+   Pure functions only. No document/window access. No backend calls. */
+var WashWiseLib = (function () {
+  "use strict";
+
+  /* ---------------- SVG builders (string output only, no DOM) ---------------- */
+  var INK = "#e8f1fb";
+  var CROSS = "#f87171";
+
+  function openSvg(label) {
+    return '<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + label + '">';
+  }
+  function closeSvg() { return "</svg>"; }
+  function crossMark() {
+    return '<g stroke="' + CROSS + '" stroke-width="5" stroke-linecap="round">' +
+      '<line x1="11" y1="11" x2="53" y2="53"/>' +
+      '<line x1="53" y1="11" x2="11" y2="53"/></g>';
+  }
+  function tempText(t, y) {
+    return '<text x="32" y="' + (y || 43) + '" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" ' +
+      'font-size="16" font-weight="bold" fill="' + INK + '" stroke="none">' + t + "</text>";
+  }
+  function underBar(y, x1, x2) {
+    return '<line x1="' + (x1 || 10) + '" y1="' + y + '" x2="' + (x2 || 54) + '" y2="' + y +
+      '" stroke="' + INK + '" stroke-width="3.5" stroke-linecap="round"/>';
+  }
+  function tubShell(inner) {
+    var s = '<g fill="none" stroke="' + INK + '" stroke-width="3.5" stroke-linejoin="round">';
+    s += '<path d="M8 16 H56 L49 52 H15 Z"/>';
+    s += '<path d="M13 24 q5 -4 9.5 0 t9.5 0 t9.5 0 t9.5 0" stroke-width="2.5" fill="none"/>';
+    s += "</g>";
+    return s + (inner || "");
+  }
+  function tubSvg(opts) {
+    opts = opts || {};
+    var label = opts.label || "wash symbol";
+    var s = openSvg(label) + tubShell(opts.inner || "");
+    if (opts.temp) s += tempText(opts.temp, opts.tempY);
+    if (opts.bars >= 1) s += underBar(58);
+    if (opts.bars >= 2) s += underBar(62.5, 14, 50);
+    if (opts.crossed) s += crossMark();
+    return s + closeSvg();
+  }
+  function handGlyph() {
+    return '<g transform="translate(32 38) rotate(-18)" fill="' + INK + '" stroke="none">' +
+      '<rect x="-8" y="-2" width="16" height="15" rx="6"/>' +
+      '<rect x="-8" y="-13" width="4.6" height="13" rx="2.3"/>' +
+      '<rect x="-2.7" y="-15" width="4.6" height="15" rx="2.3"/>' +
+      '<rect x="2.6" y="-14" width="4.6" height="14" rx="2.3"/>' +
+      '<rect x="6.5" y="-6" width="4.4" height="11" rx="2.2" transform="rotate(30 8.7 -0.5)"/>' +
+      "</g>";
+  }
+  function bleachSvg(kind) {
+    var s = openSvg("bleach symbol");
+    s += '<path d="M32 8 L58 54 L6 54 Z" fill="none" stroke="' + INK + '" stroke-width="3.5" stroke-linejoin="round"/>';
+    if (kind === "nonchlorine") {
+      s += '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round">' +
+        '<line x1="27" y1="21" x2="19" y2="43"/><line x1="37" y1="21" x2="29" y2="43"/></g>';
+    }
+    if (kind === "no") s += crossMark();
+    return s + closeSvg();
+  }
+  function drySvg(kind, heat, shade) {
+    var s = openSvg("dry symbol");
+    s += '<rect x="8" y="8" width="48" height="48" fill="none" stroke="' + INK + '" stroke-width="3.5"/>';
+    if (kind === "tumble") {
+      s += '<circle cx="32" cy="32" r="17" fill="none" stroke="' + INK + '" stroke-width="3.5"/>';
+      if (heat === "noheat") {
+        s += '<circle cx="32" cy="32" r="6.5" fill="' + INK + '" stroke="none"/>';
+      } else {
+        var dots = heat === "low" ? [[32, 32]] : heat === "med" ? [[26, 32], [38, 32]] : [[24, 29], [40, 29], [32, 41]];
+        for (var i = 0; i < dots.length; i++) {
+          s += '<circle cx="' + dots[i][0] + '" cy="' + dots[i][1] + '" r="3.4" fill="' + INK + '" stroke="none"/>';
+        }
+      }
+    } else if (kind === "line") {
+      s += '<path d="M12 13 Q32 31 52 13" fill="none" stroke="' + INK + '" stroke-width="3.5" stroke-linecap="round"/>';
+    } else if (kind === "drip") {
+      s += '<g stroke="' + INK + '" stroke-width="3.5" stroke-linecap="round">' +
+        '<line x1="22" y1="13" x2="22" y2="27"/><line x1="32" y1="13" x2="32" y2="27"/><line x1="42" y1="13" x2="42" y2="27"/></g>';
+    } else if (kind === "flat") {
+      s += '<line x1="14" y1="32" x2="50" y2="32" stroke="' + INK + '" stroke-width="3.5" stroke-linecap="round"/>';
+    }
+    if (shade) {
+      s += '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round">' +
+        '<line x1="8" y1="24" x2="24" y2="8"/><line x1="8" y1="33" x2="33" y2="8"/></g>';
+    }
+    if (kind === "no") s += crossMark();
+    return s + closeSvg();
+  }
+  function ironSvg(kind) {
+    var s = openSvg("iron symbol");
+    s += '<g fill="none" stroke="' + INK + '" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">';
+    s += '<path d="M14 46 H50 L57 33 L41 15 H25 Q14 15 14 26 Z"/>';
+    s += '<path d="M25 15 V8 H43 V19"/>';
+    s += '<line x1="10" y1="51" x2="58" y2="51"/>';
+    s += "</g>";
+    if (kind === "low" || kind === "med" || kind === "high") {
+      var n = kind === "low" ? 1 : kind === "med" ? 2 : 3;
+      var xs = n === 1 ? [33] : n === 2 ? [27, 39] : [22, 33, 44];
+      for (var i = 0; i < xs.length; i++) {
+        s += '<circle cx="' + xs[i] + '" cy="33" r="3.2" fill="' + INK + '" stroke="none"/>';
+      }
+    }
+    if (kind === "nosteam") {
+      s += '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round">' +
+        '<path d="M22 56 q3 -2 0 -4" fill="none"/><path d="M32 56 q3 -2 0 -4" fill="none"/><path d="M42 56 q3 -2 0 -4" fill="none"/></g>';
+      s += '<g stroke="' + CROSS + '" stroke-width="4" stroke-linecap="round"><line x1="16" y1="52" x2="48" y2="60"/><line x1="48" y1="52" x2="16" y2="60"/></g>';
+    }
+    if (kind === "steamok") {
+      s += '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round" fill="none">' +
+        '<path d="M22 58 q3 -3 0 -6"/><path d="M32 58 q3 -3 0 -6"/><path d="M42 58 q3 -3 0 -6"/></g>';
+    }
+    if (kind === "no") s += crossMark();
+    return s + closeSvg();
+  }
+  function proSvg(letter, bars, crossed, doubleRing) {
+    var s = openSvg("professional care symbol");
+    s += '<circle cx="32" cy="31" r="22" fill="none" stroke="' + INK + '" stroke-width="3.5"/>';
+    if (doubleRing) s += '<circle cx="32" cy="31" r="17.5" fill="none" stroke="' + INK + '" stroke-width="2"/>';
+    if (letter) {
+      s += '<text x="32" y="40" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="22" ' +
+        'font-weight="bold" fill="' + INK + '" stroke="none">' + letter + "</text>";
+    }
+    if (bars >= 1) s += underBar(58);
+    if (bars >= 2) s += underBar(62.5, 16, 48);
+    if (crossed) s += crossMark();
+    return s + closeSvg();
+  }
+
+  /* ---------------- symbol dataset ---------------- */
+  var SYMBOLS = [];
+  function S(code, name, family, meaning, detail, attrs, svg, care) {
+    SYMBOLS.push({ code: code, name: name, family: family, meaning: meaning, detail: detail,
+      attrs: attrs || {}, svg: svg, care: care || null });
+  }
+  function washCare(title, text) { return { stage: "wash", order: 1, title: title, text: text }; }
+
+  /* WASHING (tub) — ISO 3758 */
+  S("WASH", "Machine wash", "wash", "Machine washable on a normal cycle.",
+    "The garment can go in a normal machine-wash cycle with regular detergent. Check the temperature dots or numbers if shown.",
+    { temp: null, bars: 0 }, tubSvg({ label: "machine wash" }),
+    washCare("Machine wash", "Use a normal wash cycle with regular detergent."));
+  S("WASH_30", "Machine wash 30°C", "wash", "Machine wash at max 30°C.",
+    "Cold wash. Best for delicate fabrics, dark colours and lightly soiled items; saves energy too.",
+    { temp: 30, bars: 0 }, tubSvg({ temp: 30, label: "wash 30" }),
+    washCare("Machine wash — 30°C max", "Keep water temperature at or below 30°C."));
+  S("WASH_40", "Machine wash 40°C", "wash", "Machine wash at max 40°C.",
+    "The everyday setting for most cottons, synthetics and mixed fabrics.",
+    { temp: 40, bars: 0 }, tubSvg({ temp: 40, label: "wash 40" }),
+    washCare("Machine wash — 40°C max", "Keep water temperature at or below 40°C."));
+  S("WASH_50", "Machine wash 50°C", "wash", "Machine wash at max 50°C.",
+    "Warmer wash for sturdy cottons and moderately soiled laundry.",
+    { temp: 50, bars: 0 }, tubSvg({ temp: 50, label: "wash 50" }),
+    washCare("Machine wash — 50°C max", "Keep water temperature at or below 50°C."));
+  S("WASH_60", "Machine wash 60°C", "wash", "Machine wash at max 60°C.",
+    "Hot wash for whites, bedding and towels. Kills most bacteria and dust mites.",
+    { temp: 60, bars: 0 }, tubSvg({ temp: 60, label: "wash 60" }),
+    washCare("Machine wash — 60°C max", "Hot wash, great for whites and bedding."));
+  S("WASH_70", "Machine wash 70°C", "wash", "Machine wash at max 70°C.",
+    "Very hot wash for heavily soiled workwear and hygiene-critical items.",
+    { temp: 70, bars: 0 }, tubSvg({ temp: 70, label: "wash 70" }),
+    washCare("Machine wash — 70°C max", "Very hot wash for heavy soiling."));
+  S("WASH_95", "Machine wash 95°C", "wash", "Machine wash at max 95°C (boil wash).",
+    "Near-boiling wash for maximum hygiene — white cottons and linens only.",
+    { temp: 95, bars: 0 }, tubSvg({ temp: 95, label: "wash 95" }),
+    washCare("Machine wash — 95°C max", "Boil wash for maximum hygiene (whites only)."));
+  S("WASH_30_GENTLE", "Gentle wash 30°C", "wash", "Gentle (permanent-press) cycle, max 30°C.",
+    "One bar under the tub means a gentler cycle: reduced agitation and a shorter spin.",
+    { temp: 30, bars: 1 }, tubSvg({ temp: 30, bars: 1, label: "gentle wash 30" }),
+    washCare("Gentle cycle — 30°C max", "Use the permanent-press/gentle cycle with reduced agitation."));
+  S("WASH_40_GENTLE", "Gentle wash 40°C", "wash", "Gentle (permanent-press) cycle, max 40°C.",
+    "One bar under the tub means a gentler cycle: reduced agitation and a shorter spin.",
+    { temp: 40, bars: 1 }, tubSvg({ temp: 40, bars: 1, label: "gentle wash 40" }),
+    washCare("Gentle cycle — 40°C max", "Use the permanent-press/gentle cycle with reduced agitation."));
+  S("WASH_30_VGENTLE", "Very gentle wash 30°C", "wash", "Very gentle (delicates) cycle, max 30°C.",
+    "Two bars mean the mildest machine treatment: minimal agitation, low spin, ideally in a mesh bag.",
+    { temp: 30, bars: 2 }, tubSvg({ temp: 30, bars: 2, label: "very gentle wash 30" }),
+    washCare("Delicates cycle — 30°C max", "Mildest machine cycle; use a mesh laundry bag."));
+  S("WASH_40_VGENTLE", "Very gentle wash 40°C", "wash", "Very gentle (delicates) cycle, max 40°C.",
+    "Two bars mean the mildest machine treatment: minimal agitation, low spin, ideally in a mesh bag.",
+    { temp: 40, bars: 2 }, tubSvg({ temp: 40, bars: 2, label: "very gentle wash 40" }),
+    washCare("Delicates cycle — 40°C max", "Mildest machine cycle; use a mesh laundry bag."));
+  S("HAND_WASH", "Hand wash", "wash", "Hand wash only — do not machine wash.",
+    "Wash gently by hand in lukewarm water (around 30°C). Do not wring or twist; press water out softly.",
+    { handwash: true }, tubSvg({ inner: handGlyph(), label: "hand wash" }),
+    washCare("Hand wash only", "Wash by hand in lukewarm water; do not machine wash."));
+  S("NO_WASH", "Do not wash", "wash", "Do not wash — take to a professional cleaner.",
+    "The garment cannot be safely washed at home. Follow any dry-clean symbol, or ask a cleaner.",
+    { noWash: true }, tubSvg({ crossed: true, label: "do not wash" }),
+    washCare("Do not wash", "Do not wash at home — use professional cleaning."));
+  S("NO_WRING", "Do not wring", "wash", "Do not wring or twist.",
+    "Twisting damages fibres. Press water out gently or roll the garment in a clean towel.",
+    { noWring: true },
+    openSvg("do not wring") + tubShell() +
+      '<path d="M20 34 q6 -8 12 0 q6 8 12 0" fill="none" stroke="' + INK + '" stroke-width="3" stroke-linecap="round"/>' +
+      crossMark() + closeSvg(),
+    washCare("Do not wring", "Press water out gently; never twist the garment."));
+
+  /* BLEACHING (triangle) — ISO 3758 */
+  S("BLEACH", "Bleach allowed", "bleach", "Bleaching allowed (any bleach).",
+    "An empty triangle means chlorine and oxygen bleaches are both safe to use.",
+    { bleach: "allow" }, bleachSvg("plain"),
+    { stage: "bleach", order: 2, title: "Bleach allowed", text: "Any bleach (chlorine or oxygen) may be used." });
+  S("BLEACH_NONCHLORINE", "Non-chlorine bleach only", "bleach", "Oxygen / non-chlorine bleach only.",
+    "The striped triangle means chlorine bleach will damage the fabric — use oxygen-based bleach only.",
+    { bleach: "nonchlorine" }, bleachSvg("nonchlorine"),
+    { stage: "bleach", order: 2, title: "Oxygen bleach only", text: "Use non-chlorine (oxygen) bleach; never chlorine bleach." });
+  S("NO_BLEACH", "Do not bleach", "bleach", "Do not bleach.",
+    "Any bleach will damage or discolour the fabric. Use a colour-safe stain remover instead.",
+    { bleach: "no" }, bleachSvg("no"),
+    { stage: "bleach", order: 2, title: "Do not bleach", text: "Skip bleach entirely; use colour-safe stain treatment." });
+
+  /* DRYING (square) — ISO 3758 */
+  function dryCare(title, text) { return { stage: "dry", order: 3, title: title, text: text }; }
+  S("TUMBLE", "Tumble dry", "dry", "Tumble dry on any heat setting.",
+    "A circle inside the square means the garment can go in the tumble dryer.",
+    { dry: "tumble", heat: null }, drySvg("tumble", null, false),
+    dryCare("Tumble dry", "Safe for the tumble dryer on any heat setting."));
+  S("TUMBLE_LOW", "Tumble dry low heat", "dry", "Tumble dry on low heat.",
+    "One dot means low heat — the safest dryer setting for most synthetics and blends.",
+    { dry: "tumble", heat: "low" }, drySvg("tumble", "low", false),
+    dryCare("Tumble dry — low heat", "Use the low-heat dryer setting."));
+  S("TUMBLE_MED", "Tumble dry medium heat", "dry", "Tumble dry on medium heat.",
+    "Two dots mean medium heat, fine for sturdy cottons and everyday laundry.",
+    { dry: "tumble", heat: "med" }, drySvg("tumble", "med", false),
+    dryCare("Tumble dry — medium heat", "Use the medium-heat dryer setting."));
+  S("TUMBLE_HIGH", "Tumble dry high heat", "dry", "Tumble dry on high heat.",
+    "Three dots mean high heat — only for robust fabrics like towels and heavy cottons.",
+    { dry: "tumble", heat: "high" }, drySvg("tumble", "high", false),
+    dryCare("Tumble dry — high heat", "High heat is safe; still avoid over-drying."));
+  S("TUMBLE_NOHEAT", "Tumble dry, no heat", "dry", "Tumble dry with no heat (air fluff).",
+    "A filled dot means air-only tumbling — great for freshening delicates without heat damage.",
+    { dry: "tumble", heat: "noheat" }, drySvg("tumble", "noheat", false),
+    dryCare("Tumble dry — no heat", "Use the air-fluff / no-heat dryer setting."));
+  S("NO_TUMBLE", "Do not tumble dry", "dry", "Do not tumble dry.",
+    "The dryer will shrink or damage this garment — air dry it instead.",
+    { dry: "notumble" }, drySvg("tumble", null, false).replace(closeSvg(), crossMark() + closeSvg()),
+    dryCare("Do not tumble dry", "Air dry only; the dryer will damage this garment."));
+  S("LINE_DRY", "Line dry", "dry", "Line dry / hang on a line.",
+    "The curved line at the top of the square means hang the garment on a washing line.",
+    { dry: "line" }, drySvg("line", null, false),
+    dryCare("Line dry", "Hang on a washing line until fully dry."));
+  S("LINE_DRY_SHADE", "Line dry in shade", "dry", "Line dry in the shade.",
+    "The diagonal lines in the corner mean keep it out of direct sunlight to prevent fading.",
+    { dry: "line", shade: true }, drySvg("line", null, true),
+    dryCare("Line dry in shade", "Hang on a line away from direct sunlight."));
+  S("DRIP_DRY", "Drip dry", "dry", "Drip dry.",
+    "Three vertical lines mean hang the garment dripping wet — no wringing or spinning first.",
+    { dry: "drip" }, drySvg("drip", null, false),
+    dryCare("Drip dry", "Hang dripping wet; do not wring or spin first."));
+  S("DRIP_DRY_SHADE", "Drip dry in shade", "dry", "Drip dry in the shade.",
+    "Hang dripping wet, out of direct sunlight.",
+    { dry: "drip", shade: true }, drySvg("drip", null, true),
+    dryCare("Drip dry in shade", "Hang dripping wet, away from direct sunlight."));
+  S("FLAT_DRY", "Dry flat", "dry", "Dry flat.",
+    "The horizontal line means lay the garment flat to dry — essential for knits that stretch on a hanger.",
+    { dry: "flat" }, drySvg("flat", null, false),
+    dryCare("Dry flat", "Lay flat on a clean towel to dry; reshape while damp."));
+  S("FLAT_DRY_SHADE", "Dry flat in shade", "dry", "Dry flat in the shade.",
+    "Lay flat to dry, away from direct sunlight to protect colours.",
+    { dry: "flat", shade: true }, drySvg("flat", null, true),
+    dryCare("Dry flat in shade", "Lay flat away from direct sunlight."));
+  S("NO_DRY", "Do not dry", "dry", "Do not dry.",
+    "A crossed square is rare and strict — follow the dry-cleaner's instructions for this garment.",
+    { dry: "no" }, drySvg("no", null, false),
+    dryCare("Do not dry", "Do not dry at home; seek professional advice."));
+
+  /* IRONING — ISO 3758 */
+  function ironCare(title, text) { return { stage: "iron", order: 4, title: title, text: text }; }
+  S("IRON", "Iron", "iron", "Iron on any temperature.",
+    "The iron symbol means ironing is safe. Use steam and any heat unless other symbols restrict it.",
+    { iron: "allow", dots: 0 }, ironSvg("plain"),
+    ironCare("Iron", "Safe to iron at any temperature."));
+  S("IRON_LOW", "Cool iron", "iron", "Cool iron — max 110°C (one dot).",
+    "One dot means a cool iron for delicate synthetics like nylon and acrylic.",
+    { iron: "allow", dots: 1 }, ironSvg("low"),
+    ironCare("Cool iron (110°C max)", "Use the lowest iron setting; test on a hidden area first."));
+  S("IRON_MED", "Warm iron", "iron", "Warm iron — max 150°C (two dots).",
+    "Two dots mean a medium iron for wool, silk and polyester blends.",
+    { iron: "allow", dots: 2 }, ironSvg("med"),
+    ironCare("Warm iron (150°C max)", "Use the medium iron setting."));
+  S("IRON_HIGH", "Hot iron", "iron", "Hot iron — max 200°C (three dots).",
+    "Three dots mean a hot iron, safe for cotton and linen.",
+    { iron: "allow", dots: 3 }, ironSvg("high"),
+    ironCare("Hot iron (200°C max)", "Safe for cotton and linen; use steam for stubborn creases."));
+  S("NO_STEAM", "Do not steam", "iron", "Do not use steam when ironing.",
+    "Iron dry only — steam will watermark or damage this fabric.",
+    { iron: "allow", dots: 0, noSteam: true }, ironSvg("nosteam"),
+    ironCare("Do not steam", "Iron dry only; keep the steam function off."));
+  S("NO_IRON", "Do not iron", "iron", "Do not iron.",
+    "Heat will melt, scorch or shine this fabric. Hang immediately after washing instead.",
+    { iron: "no" }, ironSvg("no"),
+    ironCare("Do not iron", "Never iron; hang straight after washing to avoid creases."));
+
+  /* PROFESSIONAL CARE (circle) — ISO 3758 */
+  function proCare(title, text) { return { stage: "pro", order: 5, title: title, text: text }; }
+  S("DRYCLEAN", "Dry clean", "pro", "Dry clean.",
+    "The empty circle means the garment should be professionally dry cleaned.",
+    { pro: "dryclean", solvent: null, gentle: 0 }, proSvg(null, 0, false, false),
+    proCare("Dry clean", "Take to a professional dry cleaner."));
+  S("DRYCLEAN_A", "Dry clean — any solvent", "pro", "Dry clean with any solvent.",
+    "The letter A means the cleaner may use any standard dry-cleaning solvent.",
+    { pro: "dryclean", solvent: "A", gentle: 0 }, proSvg("A", 0, false, false),
+    proCare("Dry clean (any solvent)", "Any standard dry-cleaning solvent is safe."));
+  S("DRYCLEAN_P", "Dry clean — petroleum solvent", "pro", "Dry clean, petroleum solvent only.",
+    "The letter P restricts the cleaner to petroleum-based solvents.",
+    { pro: "dryclean", solvent: "P", gentle: 0 }, proSvg("P", 0, false, false),
+    proCare("Dry clean (petroleum only)", "Cleaner must use petroleum-based solvents."));
+  S("DRYCLEAN_F", "Dry clean — no trichloroethylene", "pro", "Dry clean, any solvent except trichloroethylene.",
+    "The letter F excludes the harshest solvent; milder solvents only.",
+    { pro: "dryclean", solvent: "F", gentle: 0 }, proSvg("F", 0, false, false),
+    proCare("Dry clean (no trichloroethylene)", "Milder solvents only."));
+  S("DRYCLEAN_P_GENTLE", "Gentle dry clean (P)", "pro", "Gentle dry clean, petroleum solvent.",
+    "The bar under the circle means a gentle dry-cleaning process with petroleum solvents.",
+    { pro: "dryclean", solvent: "P", gentle: 1 }, proSvg("P", 1, false, false),
+    proCare("Gentle dry clean (P)", "Ask for a gentle cycle with petroleum solvents."));
+  S("DRYCLEAN_F_GENTLE", "Gentle dry clean (F)", "pro", "Gentle dry clean, no trichloroethylene.",
+    "The bar under the circle means a gentle process; no trichloroethylene.",
+    { pro: "dryclean", solvent: "F", gentle: 1 }, proSvg("F", 1, false, false),
+    proCare("Gentle dry clean (F)", "Ask for a gentle cycle; no trichloroethylene."));
+  S("NO_DRYCLEAN", "Do not dry clean", "pro", "Do not dry clean.",
+    "Dry-cleaning solvents will damage this garment — wash or wet clean instead.",
+    { pro: "no" }, proSvg(null, 0, true, false),
+    proCare("Do not dry clean", "Avoid dry-cleaning solvents entirely."));
+  S("WETCLEAN", "Professional wet clean", "pro", "Professional wet cleaning.",
+    "The W in a circle means professional wet cleaning — a gentler water-based process done by cleaners.",
+    { pro: "wetclean", gentle: 0 }, proSvg("W", 0, false, false),
+    proCare("Professional wet clean", "A cleaner can wet clean this garment safely."));
+  S("WETCLEAN_GENTLE", "Gentle wet clean", "pro", "Gentle professional wet cleaning.",
+    "The bar means the wet-clean process must be gentle.",
+    { pro: "wetclean", gentle: 1 }, proSvg("W", 1, false, false),
+    proCare("Gentle wet clean", "Ask for a gentle wet-clean process."));
+  S("WETCLEAN_VGENTLE", "Very gentle wet clean", "pro", "Very gentle professional wet cleaning.",
+    "Two bars mean the mildest wet-clean process only.",
+    { pro: "wetclean", gentle: 2 }, proSvg("W", 2, false, false),
+    proCare("Very gentle wet clean", "Mildest wet-clean process only."));
+  S("NO_WETCLEAN", "Do not wet clean", "pro", "Do not wet clean.",
+    "Water-based professional cleaning will damage this garment.",
+    { pro: "no", wet: true }, proSvg("W", 0, true, false),
+    proCare("Do not wet clean", "Avoid water-based professional cleaning."));
+
+  /* COMMON LABEL EXTRAS — widely printed on care labels, not part of ISO 3758 */
+  function extrasSvg(draw) {
+    return openSvg("label extra") + draw + closeSvg();
+  }
+  S("WASH_COLD", "Wash cold", "extras", "Wash cold (30°C or below).",
+    "A common label extra: keep the wash cold to protect colours and save energy.",
+    { temp: 30, bars: 0 },
+    tubSvg({ label: "wash cold", inner:
+      '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round">' +
+      '<line x1="32" y1="26" x2="32" y2="46"/><line x1="23.5" y1="31" x2="40.5" y2="41"/><line x1="40.5" y1="31" x2="23.5" y2="41"/></g>' }),
+    washCare("Wash cold", "Cold wash at 30°C or below."));
+  S("WASH_SEPARATE", "Wash separately", "extras", "Wash separately from other laundry.",
+    "The colour may run. Wash this garment alone or with identical items.",
+    { separate: true },
+    tubSvg({ label: "wash separately", inner:
+      '<line x1="32" y1="22" x2="32" y2="50" stroke="' + INK + '" stroke-width="2.5" stroke-dasharray="4 3"/>' }),
+    washCare("Wash separately", "Wash alone — colours may bleed onto other clothes."));
+  S("WASH_LIKE_COLOURS", "Wash with like colours", "extras", "Wash with similar colours only.",
+    "Sort this garment with matching colours to avoid dye transfer.",
+    {},
+    tubSvg({ label: "wash with like colours", inner:
+      '<circle cx="24" cy="36" r="5" fill="#38bdf8" stroke="none"/><circle cx="32" cy="36" r="5" fill="#fbbf24" stroke="none"/><circle cx="40" cy="36" r="5" fill="#f87171" stroke="none"/>' }),
+    washCare("Wash with like colours", "Sort with similar colours before washing."));
+  S("WASH_INSIDE_OUT", "Wash inside out", "extras", "Turn inside out before washing.",
+    "Protects prints, embroidery and outer finishes from abrasion and fading.",
+    {},
+    tubSvg({ label: "wash inside out", inner:
+      '<path d="M22 44 q10 -14 20 0" fill="none" stroke="' + INK + '" stroke-width="2.5"/>' +
+      '<path d="M38 36 l5 8 l-9 1" fill="none" stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' }),
+    washCare("Wash inside out", "Turn the garment inside out before loading."));
+  S("CLOSE_FASTENERS", "Close zips and fasteners", "extras", "Close all zips, hooks and fasteners.",
+    "Open zips snag and tear other garments in the wash.",
+    {},
+    extrasSvg('<g stroke="' + INK + '" stroke-width="3" stroke-linecap="round">' +
+      '<line x1="32" y1="10" x2="32" y2="54"/>' +
+      '<line x1="26" y1="16" x2="38" y2="16"/><line x1="26" y1="24" x2="38" y2="24"/><line x1="26" y1="32" x2="38" y2="32"/><line x1="26" y1="40" x2="38" y2="40"/></g>' +
+      '<rect x="27" y="44" width="10" height="12" rx="3" fill="none" stroke="' + INK + '" stroke-width="3"/>'),
+    washCare("Close fasteners", "Zip up and fasten everything before washing."));
+  S("REMOVE_TRIMS", "Remove detachable trims", "extras", "Remove detachable trims and accessories.",
+    "Belts, brooches and detachable fur or faux-fur trims should come off before washing.",
+    {},
+    extrasSvg('<rect x="14" y="20" width="36" height="24" rx="4" fill="none" stroke="' + INK + '" stroke-width="3" stroke-dasharray="5 4"/>' +
+      '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round"><circle cx="22" cy="50" r="3.5" fill="none"/><circle cx="32" cy="50" r="3.5" fill="none"/><line x1="24" y1="47" x2="44" y2="28"/><line x1="30" y1="47" x2="44" y2="38"/></g>'),
+    washCare("Remove detachable trims", "Take off belts, brooches and detachable trims first."));
+  S("NO_SOAK", "Do not soak", "extras", "Do not soak before washing.",
+    "Prolonged soaking weakens fibres or loosens dyes — wash promptly instead.",
+    { noSoak: true },
+    extrasSvg('<path d="M32 10 q12 16 0 30 q-12 -14 0 -30" fill="none" stroke="' + INK + '" stroke-width="3.5" stroke-linejoin="round"/>' + crossMark()),
+    washCare("Do not soak", "Skip pre-soaking; wash promptly instead."));
+  S("RESHAPE_DAMP", "Reshape while damp", "extras", "Reshape the garment while damp.",
+    "Gently pull knits back into shape before drying so they keep their fit.",
+    {},
+    extrasSvg('<rect x="16" y="22" width="32" height="20" rx="6" fill="none" stroke="' + INK + '" stroke-width="3"/>' +
+      '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round" fill="none"><path d="M12 18 L6 12 M6 12 h7 M6 12 v7"/><path d="M52 18 L58 12 M58 12 h-7 M58 12 v7"/></g>'),
+    { stage: "dry", order: 3, title: "Reshape while damp", text: "Gently reshape knits before drying." });
+  S("HANG_DRY", "Hang to dry", "extras", "Hang to dry.",
+    "Use a hanger rather than a line or dryer — good for shirts and light jackets.",
+    { dry: "line" },
+    extrasSvg('<g fill="none" stroke="' + INK + '" stroke-width="3" stroke-linecap="round"><path d="M32 14 q0 -6 6 -6"/><path d="M32 14 L12 34 H52 Z"/></g>'),
+    dryCare("Hang to dry", "Hang on a hanger until fully dry."));
+  S("DRY_AWAY_HEAT", "Dry away from direct heat", "extras", "Dry away from direct heat and sunlight.",
+    "Radiators and harsh sun can shrink, fade or scorch fabrics — choose a shaded, airy spot.",
+    {},
+    extrasSvg('<circle cx="32" cy="32" r="10" fill="none" stroke="' + INK + '" stroke-width="3.5"/>' +
+      '<g stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round"><line x1="32" y1="12" x2="32" y2="18"/><line x1="32" y1="46" x2="32" y2="52"/><line x1="12" y1="32" x2="18" y2="32"/><line x1="46" y1="32" x2="52" y2="32"/><line x1="18" y1="18" x2="22" y2="22"/><line x1="42" y1="42" x2="46" y2="46"/><line x1="46" y1="18" x2="42" y2="22"/><line x1="22" y1="42" x2="18" y2="46"/></g>' + crossMark()),
+    dryCare("Dry away from direct heat", "Dry in a shaded, airy spot — no radiators or harsh sun."));
+  S("IRON_REVERSE", "Iron on reverse side", "extras", "Iron on the reverse (inside) side.",
+    "Protects prints, dark colours and delicate finishes from shine marks.",
+    {},
+    extrasSvg('<g fill="none" stroke="' + INK + '" stroke-width="3" stroke-linejoin="round"><path d="M12 38 V24 q0 -8 10 -8 h12 l10 14 q4 6 -3 8 Z"/><path d="M20 38 q12 -10 26 -4" stroke-linecap="round"/></g>'),
+    ironCare("Iron on reverse", "Turn inside out and iron the reverse side."));
+  S("STEAM_OK", "Steam finishing allowed", "extras", "Steam finishing allowed.",
+    "A steamer or the iron's steam function is safe for refreshing this garment.",
+    {},
+    ironSvg("steamok"),
+    ironCare("Steam allowed", "Steam finishing is safe for this garment."));
+  S("SPOT_CLEAN", "Spot clean only", "extras", "Spot clean only.",
+    "Do not immerse — dab stains with a damp cloth and mild detergent, then air dry.",
+    { noWash: true },
+    extrasSvg('<circle cx="32" cy="32" r="22" fill="none" stroke="' + INK + '" stroke-width="3.5"/>' +
+      '<path d="M32 20 q8 11 0 20 q-8 -9 0 -20" fill="none" stroke="' + INK + '" stroke-width="3" stroke-linejoin="round"/>'),
+    proCare("Spot clean only", "Dab stains with a damp cloth; do not immerse."));
+  S("DRYCLEAN_ONLY", "Dry clean only", "extras", "Dry clean only — no home washing.",
+    "Stricter than a plain dry-clean symbol: no water-based cleaning at home at all.",
+    { noWash: true, pro: "dryclean", solvent: null, gentle: 0 },
+    proSvg(null, 0, false, true),
+    proCare("Dry clean only", "No home washing — professional dry cleaning only."));
+  S("SHORT_SPIN", "Short spin cycle", "extras", "Use a short spin cycle.",
+    "Reduces creasing and fibre stress — pick the low/short spin option on your machine.",
+    {},
+    tubSvg({ label: "short spin", inner:
+      '<path d="M32 26 a10 10 0 1 1 -7 7" fill="none" stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<path d="M20 30 l6 4 l-1 -7" fill="none" stroke="' + INK + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' }),
+    washCare("Short spin", "Select the short / low spin option."));
+
+  /* ---------------- lookups ---------------- */
+  var BY_CODE = {};
+  for (var i = 0; i < SYMBOLS.length; i++) BY_CODE[SYMBOLS[i].code] = SYMBOLS[i];
+
+  var FAMILIES = [
+    { id: "wash", label: "Washing", desc: "Tub symbols — machine, hand and temperature rules" },
+    { id: "bleach", label: "Bleaching", desc: "Triangle symbols — what whitening is safe" },
+    { id: "dry", label: "Drying", desc: "Square symbols — tumble, line, drip and flat" },
+    { id: "iron", label: "Ironing", desc: "Iron symbols — temperature dots and steam" },
+    { id: "pro", label: "Professional care", desc: "Circle symbols — dry clean and wet clean" },
+    { id: "extras", label: "Label extras", desc: "Common printed extras beyond the ISO set" }
+  ];
+
+  function getSymbol(code) {
+    if (typeof code !== "string") return null;
+    return BY_CODE[code.toUpperCase()] || null;
+  }
+  function symbolsByFamily(family) {
+    return SYMBOLS.filter(function (s) { return s.family === family; });
+  }
+  function searchSymbols(q) {
+    q = String(q || "").trim().toLowerCase();
+    if (!q) return SYMBOLS.slice();
+    return SYMBOLS.filter(function (s) {
+      return s.name.toLowerCase().indexOf(q) !== -1 ||
+        s.meaning.toLowerCase().indexOf(q) !== -1 ||
+        s.code.toLowerCase().indexOf(q) !== -1;
+    });
+  }
+  function uniqueValidCodes(codes) {
+    var seen = {}, out = [];
+    (codes || []).forEach(function (c) {
+      var s = getSymbol(c);
+      if (s && !seen[s.code]) { seen[s.code] = true; out.push(s.code); }
+    });
+    return out;
+  }
+
+  /* ---------------- care card + timeline ---------------- */
+  var STAGE_META = {
+    wash: { order: 1, label: "Wash" },
+    bleach: { order: 2, label: "Bleach" },
+    dry: { order: 3, label: "Dry" },
+    iron: { order: 4, label: "Iron" },
+    pro: { order: 5, label: "Professional care" }
+  };
+  function buildTimeline(codes) {
+    var steps = [];
+    uniqueValidCodes(codes).forEach(function (code) {
+      var s = getSymbol(code);
+      if (s && s.care) {
+        steps.push({ stage: s.care.stage, order: s.care.order, code: s.code,
+          title: s.care.title, text: s.care.text, svg: s.svg });
+      }
+    });
+    steps.sort(function (a, b) { return a.order - b.order; });
+    return steps;
+  }
+  function buildCareCard(codes) {
+    var valid = uniqueValidCodes(codes);
+    var symbols = valid.map(getSymbol);
+    var steps = buildTimeline(valid);
+    var warnings = [];
+    symbols.forEach(function (s) {
+      if (s.attrs.noWash) warnings.push(s.name + ": keep this garment out of the washing machine.");
+      if (s.attrs.noWring) warnings.push(s.name + ": never twist — press water out gently.");
+      if (s.code === "NO_BLEACH") warnings.push("No bleach of any kind on this garment.");
+      if (s.code === "NO_TUMBLE") warnings.push("The tumble dryer is off-limits for this one.");
+    });
+    return { count: symbols.length, symbols: symbols, steps: steps, warnings: warnings };
+  }
+
+  /* ---------------- mixed-load conflict checker ---------------- */
+  function garmentProfile(codes) {
+    var p = { temps: [], barsMax: 0, noWash: false, handwash: false, noWring: false,
+      bleach: null, dry: [], tumbleHeat: null, ironDots: null, ironNo: false,
+      pro: [], separate: false, validCodes: [] };
+    uniqueValidCodes(codes).forEach(function (code) {
+      var s = getSymbol(code), a = s.attrs;
+      p.validCodes.push(code);
+      if (typeof a.temp === "number") p.temps.push(a.temp);
+      if (a.bars > p.barsMax) p.barsMax = a.bars;
+      if (a.noWash) p.noWash = true;
+      if (a.handwash) p.handwash = true;
+      if (a.noWring) p.noWring = true;
+      if (a.bleach) p.bleach = a.bleach;
+      if (a.dry) p.dry.push(a.dry);
+      if (a.heat && a.dry === "tumble") p.tumbleHeat = a.heat;
+      if (a.iron === "no") p.ironNo = true;
+      else if (typeof a.dots === "number") p.ironDots = p.ironDots === null ? a.dots : Math.min(p.ironDots, a.dots);
+      if (a.pro) p.pro.push(a.pro);
+      if (a.separate) p.separate = true;
+    });
+    return p;
+  }
+  function checkLoadConflicts(garments) {
+    var list = Array.isArray(garments) ? garments : [];
+    var conflicts = [];
+    var analysed = list.map(function (g) {
+      return { name: String((g && g.name) || "Unnamed garment"), codes: (g && g.codes) || [], p: garmentProfile((g && g.codes) || []) };
+    });
+
+    analysed.forEach(function (g) {
+      if (g.p.noWash) conflicts.push({ type: "nowash", severity: "high",
+        message: g.name + " must NOT be machine washed — hand wash or dry clean it separately." });
+      if (g.p.validCodes.length === 0) conflicts.push({ type: "unknown", severity: "low",
+        message: g.name + " has no recognised symbols yet — decode its label first." });
+    });
+
+    var washable = analysed.filter(function (g) { return !g.p.noWash && g.p.temps.length > 0; });
+    if (washable.length >= 2) {
+      var allTemps = [];
+      washable.forEach(function (g) { allTemps = allTemps.concat(g.p.temps); });
+      var lo = Math.min.apply(null, allTemps), hi = Math.max.apply(null, allTemps);
+      if (hi - lo > 10) {
+        var hot = washable.filter(function (g) { return Math.max.apply(null, g.p.temps) === hi; }).map(function (g) { return g.name; });
+        var cold = washable.filter(function (g) { return Math.max.apply(null, g.p.temps) === lo; }).map(function (g) { return g.name; });
+        conflicts.push({ type: "temp", severity: "high",
+          message: "Temperature clash: " + hot.join(", ") + " can take " + hi + "°C but " + cold.join(", ") +
+            " maxes out at " + lo + "°C. Wash everything at " + lo + "°C or split into two loads." });
+      }
+    }
+    var delicate = analysed.filter(function (g) { return g.p.barsMax === 2; });
+    var rugged = analysed.filter(function (g) { return g.p.barsMax === 0 && g.p.temps.length > 0; });
+    if (delicate.length > 0 && rugged.length > 0) {
+      conflicts.push({ type: "cycle", severity: "medium",
+        message: "Cycle clash: " + delicate.map(function (g) { return g.name; }).join(", ") +
+          " need a very-gentle delicates cycle, but the rest of the load is normal wash. Run delicates separately." });
+    }
+    var noBleach = analysed.filter(function (g) { return g.p.bleach === "no"; });
+    var bleachOk = analysed.filter(function (g) { return g.p.bleach === "allow"; });
+    if (noBleach.length > 0 && bleachOk.length > 0) {
+      conflicts.push({ type: "bleach", severity: "medium",
+        message: "Bleach clash: " + noBleach.map(function (g) { return g.name; }).join(", ") +
+          " must not be bleached — skip bleach for this whole load." });
+    }
+    var tumble = analysed.filter(function (g) { return g.p.dry.indexOf("tumble") !== -1; });
+    var noTumble = analysed.filter(function (g) {
+      return g.p.dry.some(function (d) { return d === "notumble" || d === "line" || d === "drip" || d === "flat" || d === "no"; });
+    });
+    if (tumble.length > 0 && noTumble.length > 0) {
+      conflicts.push({ type: "dry", severity: "medium",
+        message: "Drying clash: " + noTumble.map(function (g) { return g.name; }).join(", ") +
+          " cannot go in the dryer. Air-dry them separately after the wash." });
+    }
+    var separate = analysed.filter(function (g) { return g.p.separate; });
+    if (separate.length > 0 && analysed.length > 1) {
+      conflicts.push({ type: "separate", severity: "medium",
+        message: separate.map(function (g) { return g.name; }).join(", ") +
+          " is labelled wash-separately — give it its own load to avoid dye transfer." });
+    }
+
+    var summary = analysed.length === 0 ? "No garments added yet." :
+      conflicts.length === 0 ? "No conflicts found — this load can be washed together." :
+      conflicts.length + " issue" + (conflicts.length > 1 ? "s" : "") + " found in this load.";
+    return { ok: conflicts.length === 0, conflicts: conflicts, summary: summary, garments: analysed.length };
+  }
+
+  /* ---------------- garment profiles (pure validation/summary) ---------------- */
+  function validateProfile(p) {
+    var errors = [];
+    if (!p || typeof p !== "object") return { valid: false, errors: ["Profile must be an object."] };
+    if (!p.name || !String(p.name).trim()) errors.push("Give the garment a name (e.g. blue denim jacket).");
+    var valid = uniqueValidCodes(p.codes);
+    if (valid.length === 0) errors.push("Add at least one recognised care symbol.");
+    if (p.fabric && String(p.fabric).length > 120) errors.push("Fabric note is too long (max 120 characters).");
+    return { valid: errors.length === 0, errors: errors, codes: valid };
+  }
+  function profileSummary(p) {
+    var card = buildCareCard(p.codes || []);
+    var temps = card.symbols.map(function (s) { return s.attrs.temp; }).filter(function (t) { return typeof t === "number"; });
+    return {
+      name: String(p.name || "Unnamed"),
+      symbolCount: card.count,
+      maxTemp: temps.length ? Math.max.apply(null, temps) : null,
+      stepCount: card.steps.length,
+      warningCount: card.warnings.length
+    };
+  }
+  function cheatSheetData() {
+    return FAMILIES.map(function (f) {
+      return { id: f.id, label: f.label, desc: f.desc,
+        symbols: symbolsByFamily(f.id).map(function (s) {
+          return { code: s.code, name: s.name, meaning: s.meaning, svg: s.svg };
+        }) };
+    });
+  }
+
+  return {
+    SYMBOLS: SYMBOLS,
+    FAMILIES: FAMILIES,
+    getSymbol: getSymbol,
+    symbolsByFamily: symbolsByFamily,
+    searchSymbols: searchSymbols,
+    buildCareCard: buildCareCard,
+    buildTimeline: buildTimeline,
+    garmentProfile: garmentProfile,
+    checkLoadConflicts: checkLoadConflicts,
+    validateProfile: validateProfile,
+    profileSummary: profileSummary,
+    cheatSheetData: cheatSheetData
+  };
+})();
+
+</script>
+
+<script>
+(function () {
+  "use strict";
+  var lib = WashWiseLib;
+  function el(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  /* ---------- tabs ---------- */
+  var tabBtns = document.querySelectorAll(".tab-btn");
+  tabBtns.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      tabBtns.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      document.querySelectorAll('main#tool section[role="tabpanel"]').forEach(function (s) { s.classList.add("hidden"); });
+      el(btn.getAttribute("data-tab")).classList.remove("hidden");
+    });
+  });
+
+  /* ---------- decoder: grid, filter, selection ---------- */
+  var selected = [];
+  var currentFamily = "all";
+
+  function renderChips() {
+    var html = '<button class="fam-chip' + (currentFamily === "all" ? " active" : "") + '" data-fam="all">All 62</button>';
+    lib.FAMILIES.forEach(function (f) {
+      html += '<button class="fam-chip' + (currentFamily === f.id ? " active" : "") + '" data-fam="' + f.id + '">' + esc(f.label) + "</button>";
+    });
+    el("family-chips").innerHTML = html;
+  }
+  el("family-chips").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-fam]");
+    if (!b) return;
+    currentFamily = b.getAttribute("data-fam");
+    renderChips();
+    renderGrid();
+  });
+
+  function renderGrid() {
+    var q = el("symbol-search").value;
+    var list = lib.searchSymbols(q).filter(function (s) {
+      return currentFamily === "all" || s.family === currentFamily;
+    });
+    el("symbol-grid").innerHTML = list.map(function (s) {
+      var on = selected.indexOf(s.code) >= 0;
+      return '<button class="sym-tile' + (on ? " selected" : "") + '" data-code="' + s.code + '" title="' + esc(s.meaning) + '">' +
+        s.svg + "<span>" + esc(s.name) + "</span></button>";
+    }).join("") || '<p class="text-slate-400 text-sm col-span-full py-6 text-center">No symbols match your search.</p>';
+  }
+  el("symbol-search").addEventListener("input", renderGrid);
+
+  function toggle(code) {
+    var i = selected.indexOf(code);
+    if (i >= 0) selected.splice(i, 1); else selected.push(code);
+    renderGrid();
+    renderTray();
+  }
+  el("symbol-grid").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-code]");
+    if (b) toggle(b.getAttribute("data-code"));
+  });
+
+  function renderTray() {
+    el("tray-count").textContent = selected.length;
+    if (!selected.length) {
+      el("label-tray").innerHTML = '<span class="text-slate-500 text-sm">Nothing selected yet — tap symbols in the grid.</span>';
+      return;
+    }
+    el("label-tray").innerHTML = selected.map(function (code) {
+      var s = lib.getSymbol(code);
+      return '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold" style="background:rgba(251,191,36,.12);border:1px solid #fbbf24;color:#fde68a">' +
+        esc(s.name) + '<span class="chip-x" data-remove="' + code + '" title="Remove">✕</span></span>';
+    }).join("");
+  }
+  el("label-tray").addEventListener("click", function (e) {
+    var x = e.target.closest("[data-remove]");
+    if (x) toggle(x.getAttribute("data-remove"));
+  });
+  el("clear-label-btn").addEventListener("click", function () {
+    selected = [];
+    renderGrid(); renderTray();
+    el("care-card").innerHTML = "";
+  });
+
+  /* ---------- care card ---------- */
+  var STAGE_STYLE = {
+    wash:   { bg: "#38bdf8", fg: "#0e1b2c", n: "1" },
+    bleach: { bg: "#a78bfa", fg: "#0e1b2c", n: "2" },
+    dry:    { bg: "#fbbf24", fg: "#0e1b2c", n: "3" },
+    iron:   { bg: "#fb7185", fg: "#0e1b2c", n: "4" },
+    pro:    { bg: "#34d399", fg: "#0e1b2c", n: "5" }
+  };
+  function stageLabel(stage) {
+    return { wash: "Wash", bleach: "Bleach", dry: "Dry", iron: "Iron", pro: "Pro care" }[stage] || stage;
+  }
+  el("decode-btn").addEventListener("click", function () {
+    var card = lib.buildCareCard(selected);
+    var box = el("care-card");
+    if (!card.count) {
+      box.innerHTML = '<p class="text-slate-400 text-sm">Select at least one symbol, then decode.</p>';
+      return;
+    }
+    var html = '<h3 class="font-bold mb-2" style="color:#fbbf24">Care card — ' + card.count + ' symbol' + (card.count > 1 ? "s" : "") + " decoded</h3>";
+    html += card.symbols.map(function (s) {
+      return '<div class="flex gap-3 items-start py-2.5 border-b border-slate-700/50">' +
+        '<div class="w-11 h-11 flex-none">' + s.svg + "</div>" +
+        '<div><p class="font-semibold text-sm">' + esc(s.name) + '</p>' +
+        '<p class="text-xs" style="color:#38bdf8">' + esc(s.meaning) + "</p>" +
+        '<p class="text-xs text-slate-400 mt-0.5">' + esc(s.detail) + "</p></div></div>";
+    }).join("");
+    if (card.warnings.length) {
+      html += '<div class="mt-3 p-3 rounded-xl text-xs" style="background:rgba(248,113,113,.10);border:1px solid #f87171"><p class="font-bold mb-1" style="color:#f87171">⚠ Watch out</p><ul class="list-disc pl-4 space-y-1 text-slate-300">' +
+        card.warnings.map(function (w) { return "<li>" + esc(w) + "</li>"; }).join("") + "</ul></div>";
+    }
+    if (card.steps.length) {
+      html += '<h3 class="font-bold mt-4 mb-2" style="color:#38bdf8">Wash → dry → iron timeline</h3><div class="space-y-2">';
+      html += card.steps.map(function (st) {
+        var stl = STAGE_STYLE[st.stage] || STAGE_STYLE.wash;
+        return '<div class="flex gap-3 items-start p-2.5 rounded-xl bg-slate-800/50">' +
+          '<span class="timeline-dot text-sm" style="background:' + stl.bg + ";color:" + stl.fg + '">' + stl.n + "</span>" +
+          '<div><p class="text-xs font-bold uppercase tracking-wider" style="color:' + stl.bg + '">' + stageLabel(st.stage) + "</p>" +
+          '<p class="font-semibold text-sm">' + esc(st.title) + '</p>' +
+          '<p class="text-xs text-slate-400">' + esc(st.text) + "</p></div></div>";
+      }).join("") + "</div>";
+    }
+    box.innerHTML = html;
+  });
+
+  /* ---------- mixed-load checker ---------- */
+  var garments = [];
+  function renderGarments() {
+    el("garment-list").innerHTML = garments.length ? garments.map(function (g, i) {
+      var names = g.codes.map(function (c) { var s = lib.getSymbol(c); return s ? s.name : c; });
+      return '<div class="flex items-start justify-between gap-2 p-3 rounded-xl bg-slate-800/50">' +
+        '<div><p class="font-semibold text-sm">' + esc(g.name) + '</p>' +
+        '<p class="text-xs text-slate-400">' + (names.length ? esc(names.join(" · ")) : "no symbols yet") + "</p></div>" +
+        '<button class="text-xs text-red-300 hover:text-red-200 underline flex-none" data-gdel="' + i + '">Remove</button></div>';
+    }).join("") : '<p class="text-slate-500 text-sm">No garments yet. Add the clothes in your planned load.</p>';
+  }
+  el("add-garment-btn").addEventListener("click", function () {
+    var name = el("garment-name").value.trim() || ("Garment " + (garments.length + 1));
+    garments.push({ name: name, codes: selected.slice() });
+    el("garment-name").value = "";
+    renderGarments();
+  });
+  el("garment-list").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-gdel]");
+    if (b) { garments.splice(parseInt(b.getAttribute("data-gdel"), 10), 1); renderGarments(); }
+  });
+  el("check-load-btn").addEventListener("click", function () {
+    var res = lib.checkLoadConflicts(garments);
+    var box = el("conflict-results");
+    var html = '<div class="p-3 rounded-xl text-sm font-semibold ' +
+      (res.ok ? '" style="background:rgba(52,211,153,.10);border:1px solid #34d399;color:#6ee7b7">' :
+        '" style="background:rgba(251,191,36,.08);border:1px solid #fbbf24;color:#fde68a">') + esc(res.summary) + "</div>";
+    html += res.conflicts.map(function (c) {
+      var col = c.severity === "high" ? "#f87171" : c.severity === "medium" ? "#fbbf24" : "#38bdf8";
+      var tag = c.severity === "high" ? "STOP" : c.severity === "medium" ? "CAUTION" : "NOTE";
+      return '<div class="p-3 rounded-xl text-sm" style="background:rgba(148,163,184,.06);border:1px solid ' + col + '55">' +
+        '<p class="font-bold text-xs uppercase tracking-wider mb-1" style="color:' + col + '">' + tag + " · " + esc(c.type) + "</p>" +
+        '<p class="text-slate-300 text-sm">' + esc(c.message) + "</p></div>";
+    }).join("");
+    box.innerHTML = html;
+  });
+
+  /* ---------- profiles + wash history (localStorage) ---------- */
+  var LS_P = "washwise-profiles-v1", LS_H = "washwise-history-v1";
+  function loadJSON(k) { try { return JSON.parse(localStorage.getItem(k) || "[]"); } catch (e) { return []; } }
+  function saveJSON(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  var profiles = loadJSON(LS_P), history = loadJSON(LS_H);
+
+  function renderProfiles() {
+    el("profile-list").innerHTML = profiles.length ? profiles.map(function (p, i) {
+      var sum = lib.profileSummary(p);
+      return '<div class="p-3 rounded-xl bg-slate-800/50">' +
+        '<div class="flex items-start justify-between gap-2">' +
+        '<div><p class="font-semibold text-sm">' + esc(p.name) + "</p>" +
+        (p.fabric ? '<p class="text-xs text-slate-400">' + esc(p.fabric) + "</p>" : "") +
+        '<p class="text-xs mt-1" style="color:#38bdf8">' + sum.symbolCount + " symbols" +
+        (sum.maxTemp !== null ? " · max " + sum.maxTemp + "°C" : "") +
+        (sum.warningCount ? ' · <span style="color:#f87171">' + sum.warningCount + " warning" + (sum.warningCount > 1 ? "s" : "") + "</span>" : "") + "</p></div>" +
+        '<button class="text-xs text-red-300 hover:text-red-200 underline flex-none" data-pdel="' + i + '">Delete</button></div>' +
+        '<div class="flex gap-2 mt-2">' +
+        '<button class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:#38bdf8;color:#0e1b2c" data-loadp="' + i + '">Load into decoder</button>' +
+        '<button class="text-xs px-3 py-1.5 rounded-lg font-semibold border border-amber-400/60" style="color:#fbbf24" data-logwash="' + i + '">Log wash</button>' +
+        "</div></div>";
+    }).join("") : '<p class="text-slate-500 text-sm">No profiles yet. Decode a label, name it, and save it here.</p>';
+  }
+  el("save-profile-btn").addEventListener("click", function () {
+    var p = { name: el("profile-name").value.trim(), fabric: el("profile-fabric").value.trim(), codes: selected.slice(), created: Date.now() };
+    var v = lib.validateProfile(p);
+    if (!v.valid) { alert(v.errors.join("\n")); return; }
+    p.codes = v.codes;
+    profiles.push(p);
+    saveJSON(LS_P, profiles);
+    el("profile-name").value = ""; el("profile-fabric").value = "";
+    renderProfiles();
+  });
+  el("profile-list").addEventListener("click", function (e) {
+    var d = e.target.closest("[data-pdel]");
+    if (d) { profiles.splice(parseInt(d.getAttribute("data-pdel"), 10), 1); saveJSON(LS_P, profiles); renderProfiles(); return; }
+    var l = e.target.closest("[data-loadp]");
+    if (l) {
+      selected = profiles[parseInt(l.getAttribute("data-loadp"), 10)].codes.slice();
+      renderGrid(); renderTray();
+      tabBtns.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === "tab-decoder"); });
+      document.querySelectorAll('main#tool section[role="tabpanel"]').forEach(function (s) { s.classList.add("hidden"); });
+      el("tab-decoder").classList.remove("hidden");
+      window.scrollTo({ top: el("tool").offsetTop - 70, behavior: "smooth" });
+      return;
+    }
+    var w = e.target.closest("[data-logwash]");
+    if (w) {
+      var p = profiles[parseInt(w.getAttribute("data-logwash"), 10)];
+      history.unshift({ name: p.name, at: Date.now() });
+      saveJSON(LS_H, history.slice(0, 200));
+      renderHistory();
+    }
+  });
+  function renderHistory() {
+    el("wash-history").innerHTML = history.length ? history.map(function (h) {
+      var d = new Date(h.at);
+      var when = d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) + ", " +
+        d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+      return '<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/50 text-sm">' +
+        '<span class="font-semibold">' + esc(h.name) + '</span><span class="text-xs text-slate-400">' + esc(when) + "</span></div>";
+    }).join("") : '<p class="text-slate-500 text-sm">Nothing logged yet. Use "Log wash" on any profile after laundry day.</p>';
+  }
+  el("clear-history-btn").addEventListener("click", function () {
+    if (!history.length || confirm("Clear the whole wash-history log?")) { history = []; saveJSON(LS_H, history); renderHistory(); }
+  });
+
+  /* ---------- cheat sheet ---------- */
+  function renderCheatSheet() {
+    el("cheatsheet").innerHTML = lib.cheatSheetData().map(function (f) {
+      return '<div><h3 class="font-bold text-lg mb-1" style="color:#38bdf8">' + esc(f.label) + '</h3>' +
+        '<p class="text-xs text-slate-400 mb-3">' + esc(f.desc) + "</p>" +
+        '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">' +
+        f.symbols.map(function (s) {
+          return '<div class="flex gap-2.5 items-center p-2.5 rounded-xl bg-slate-800/50">' +
+            '<div class="w-10 h-10 flex-none">' + s.svg + "</div>" +
+            '<div><p class="text-xs font-semibold leading-tight">' + esc(s.name) + '</p>' +
+            '<p class="text-[11px] text-slate-400 leading-tight">' + esc(s.meaning) + "</p></div></div>";
+        }).join("") + "</div></div>";
+    }).join("");
+  }
+  el("print-cheatsheet").addEventListener("click", function () {
+    var ps = el("print-sheet");
+    ps.innerHTML = '<h1 style="font-size:1.6rem;font-weight:800;margin-bottom:.2rem">WashWise Laundry-Room Cheat Sheet</h1>' +
+      '<p style="font-size:.8rem;color:#94a3b8;margin-bottom:1rem">The 62 most common care-label symbols, decoded. Wash → dry → iron: follow the five families.</p>' +
+      lib.cheatSheetData().map(function (f) {
+        return '<h2 style="font-size:1.05rem;font-weight:700;color:#38bdf8;margin:1rem 0 .4rem">' + esc(f.label) + "</h2>" +
+          '<div class="ps-grid">' + f.symbols.map(function (s) {
+            return '<div style="display:flex;gap:.5rem;align-items:center;border:1px solid rgba(148,163,184,.25);border-radius:.6rem;padding:.45rem">' +
+              s.svg + '<div><p style="font-size:.72rem;font-weight:700">' + esc(s.name) + '</p>' +
+              '<p style="font-size:.68rem;color:#94a3b8">' + esc(s.meaning) + "</p></div></div>";
+          }).join("") + "</div>";
+      }).join("");
+    window.print();
+  });
+
+  /* ---------- init ---------- */
+  renderChips();
+  renderGrid();
+  renderTray();
+  renderGarments();
+  renderProfiles();
+  renderHistory();
+  renderCheatSheet();
+})();
+</script>
+</body>
+</html>
